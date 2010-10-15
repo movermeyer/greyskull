@@ -1,10 +1,22 @@
-from logging import debug, error, info
+from logging import debug
+from logging import error
+from logging import info
+
 from os import environ
+
 from cgi import parse_qs
+
 from hashlib import md5
+
 from random import sample
+
 from struct import pack
-from google.appengine.api.memcache import get, set as mset, get_multi, delete as mdel, incr, decr
+
+from google.appengine.api.memcache import get
+from google.appengine.api.memcache import set as mset
+from google.appengine.api.memcache import get_multi
+from google.appengine.api.memcache import delete as mdel
+from google.appengine.api.memcache import incr, decr
 
 """
 A ntrack tracker

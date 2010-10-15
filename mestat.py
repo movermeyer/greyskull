@@ -1,8 +1,17 @@
 from time import time
+
 from os import environ
+
 from cgi import parse_qs, FieldStorage as FormPost
+
 import google.appengine.api.labs.taskqueue as tq
-from google.appengine.api.memcache import get as mget, set as mset, get_multi as mmget, delete as mdel, flush_all
+
+from google.appengine.api.memcache import get as mget
+from google.appengine.api.memcache import set as mset
+from google.appengine.api.memcache import get_multi as mmget
+from google.appengine.api.memcache import delete as mdel
+from google.appengine.api.memcache import flush_all
+
 import google.appengine.api.memcache as m
 
 NS = 'MESTAT-DATA'
