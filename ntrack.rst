@@ -72,7 +72,7 @@ Related protocols
 
 One could think of ntrack as a centralized, dynamically updated, and extremely simplified DNS system.
 
-Ntrack is compatible with [the HTTP 0.2 subset of HTTP](<http://http02.cat-v.org).
+Ntrack is compatible with `the HTTP 0.2 subset of HTTP <http://http02.cat-v.org>`_.
 
 
 Possible uses
