@@ -34,5 +34,5 @@ class NTrack(RequestHandler):
     PEER_SIZE = 6
     MAX_PEERS = 32
     MAX_PEER_SIZE = PEER_SIZE * MAX_PEERS
-    def get(self):
+    def get(self, key):
         pass
