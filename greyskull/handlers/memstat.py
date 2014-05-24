@@ -3,11 +3,6 @@
 from tornado.web import RequestHandler
 
 
-class Index(RequestHandler):
-    def get(self):
-        pass
-
-
-class Redirect(RequestHandler):
+class MemStat(RequestHandler):
     def get(self):
         pass

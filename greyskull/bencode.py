@@ -1,49 +1,30 @@
-# Bencode encoding code by Petru Paler, slightly simplified by uriel
-from types import StringType, IntType, LongType, DictType
-from types import ListType, TupleType, BooleanType
+# -*- coding: utf-8 -*-
+"""
+Bencode encoding code by Petru Paler, slightly simplified by uriel, additionally
+modified by Carlos Killpack
+"""
 
-#class Bencached(object):
-#    __slots__ = ['bencoded']
-#
-#    def __init__(self, s):
-#        self.bencoded = s
+from itertools import chain
 
-#def encode_bencached(x,r):
-#    r.append(x.bencoded)
-
-def encode_int(x, r):
-    r.extend(('i', str(x), 'e'))
-
-def encode_string(x, r):
-    r.extend((str(len(x)), ':', x))
-
-def encode_list(x, r):
-    r.append('l')
-    for i in x:
-        encode_func[type(i)](i, r)
-    r.append('e')
-
-def encode_dict(x, r):
-    r.append('d')
-    ilist = x.items()
-    ilist.sort()
-    for k, v in ilist:
-        r.extend((str(len(k)), ':', k))
-        encode_func[type(v)](v, r)
-    r.append('e')
-
-encode_func = {}
-#encode_func[type(Bencached(0))] = encode_bencached
-encode_func[IntType] = encode_int
-encode_func[LongType] = encode_int
-encode_func[StringType] = encode_string
-encode_func[ListType] = encode_list
-encode_func[TupleType] = encode_list
-encode_func[DictType] = encode_dict
-encode_func[BooleanType] = encode_int
 
 def bencode(x):
     r = []
-    encode_func[type(x)](x, r)
+    if isinstance(x, (int, long, bool)):
+        r.extend(('i', str(x), 'e'))
+    elif isinstance(x, str):
+        r.extend((str(len(x)), ':', x))
+    elif isinstance(x, (list, tuple)):
+        r.append('l')
+        r.extend(bencode(i) for i in x)
+        r.append('e')
+    elif isinstance(x, dict):
+        for key in x.iterkeys():
+            if isinstance(key, int):
+                raise TypeError
+        r.append('d')
+        ilist = x.items()
+        ilist.sort()
+        flist = tuple((bencode(k), bencode(v)) for k, v in ilist)
+        r.extend(tuple(chain(*flist)))
+        r.append('e')
     return ''.join(r)
-

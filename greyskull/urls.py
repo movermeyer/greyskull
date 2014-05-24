@@ -9,7 +9,7 @@ from greyskull.handlers import (NTrack,
                                 Redirect, )
 
 urlpatterns = [
-    url(r'/ntrk/(.*)', NTrack),
+    url(r'/ntrk/(.*)', NTrack, kwargs=dict(port='80')),  # FIXME
     url(r'/tracker', BTCompat),
     url(r'', MemStat),
     url(r'/', Index),

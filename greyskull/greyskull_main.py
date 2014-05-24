@@ -8,52 +8,38 @@ http://repo.cat-v.org/atrack/
 """
 from os import environ
 
-# We do cherrypy now
-from cgi import parse_qs
-
-from bencode import bencode
+from urllib.parse import parse_qs
 
 from struct import pack
 
+from greyskull.storage import (get,
+                               set as mset,
+                               get_multi,
+                               delete as mdel,
+                               incr,
+                               decr, )
+
+from greyskull.bencode import bencode
+
 from random import randrange
 
-# TODO: Decide if I want to switch to redis
-from google.appengine.api.memcache import get
-from google.appengine.api.memcache import set as mset
-from google.appengine.api.memcache import get_multi
-from google.appengine.api.memcache import delete as mdel
-from google.appengine.api.memcache import incr, decr
 
 # Set to false if you don't want to keep track of the number of
 # seeders and leechers
 STATS = True
 # If false we don't bother report errors to clients to save(?)
-# bandwith and CPU
+# bandwidth and CPU
 ERRORS = True
 INTERVAL = 18424
-# When to expire peers from memcache?
+# When to expire peers from memcached?
 MEMEXPIRE = 60*60*24*2
+
 
 def resps(string):
     """Sends out a response?"""
-    print "Content-type: text/plain"
-    print ""
-    print string, # Make sure we don't add a trailing new line!
-
-def prof_main():
-    """This is the main function for profiling"""
-    import cProfile, pstats, StringIO
-    import logging
-    prof = cProfile.Profile()
-    prof = prof.runctx("real_main()", globals(), locals())
-    stream = StringIO.StringIO()
-    stats = pstats.Stats(prof, stream=stream)
-    stats.sort_stats("time")  # Or cumulative
-    stats.print_stats(80)  # 80 = how many to print
-    # The rest is optional.
-    stats.print_callees()
-    stats.print_callers()
-    logging.info("Profile data:\n%s", stream.getvalue())
+    print("Content-type: text/plain")
+    print("")
+    print(string) # Make sure we don't add a trailing new line!
 
 
 def real_main():
@@ -61,7 +47,7 @@ def real_main():
     args = parse_qs(environ['QUERY_STRING'])
 
     if not args:
-        print "Status: 301 Moved Permanantly\nLocation: /\n\n",
+        print("Status: 301 Moved Permanently\nLocation: /\n\n")
         return
 
     for arg in ('info_hash', 'port'):
@@ -77,7 +63,7 @@ def real_main():
     left = args.pop('left', [None])[0]
     err = None
 
-    if(len(key) > 128):
+    if len(key) > 128:
         err = "Insanely long key!"
     else:
         try:
@@ -112,7 +98,7 @@ def real_main():
             else:
                 decr(key_incomplete, namespace='S')
 
-        return # They are going away, don't waste bw/cpu on this.
+        return  # They are going away, don't waste bw/cpu on this.
         #resps(bencode({'interval': INTERVAL, 'peers': []}))
 
     elif STATS and event == 'completed':
@@ -131,8 +117,8 @@ def real_main():
     # http://docs.python.org/library/array.html
 
     if an_info_hash:
-        als = [an_info_hash[x:x + peer_size] for x in xrange(0, l, peer_size)]
-        l = len(als) # how this works?
+        als = [an_info_hash[x:x + peer_size] for x in range(0, l, peer_size)]
+        l = len(als)  # how this works?
         if l > max_peers:
             i = randrange(0, l - max_peers)
             ii = i * peer_size
@@ -175,12 +161,12 @@ def real_main():
             mset(key_complete, '0', namespace='S')
             mset(key_incomplete, '0', namespace='S')
 
-    if phash not in als: # Assume new peer
+    if phash not in als:  # Assume new peer
         # XXX We don't refresh the peers expiration date on every request!
         mset(phash, 1, namespace='P') 
         an_info_hash += phash
         updatetrack = True
-        if STATS: # Should we bother to check event == 'started'? Why?
+        if STATS:  # Should we bother to check event == 'started'? Why?
             if left == '0':
                 incr(key_complete, namespace='S')
             else:
@@ -190,11 +176,13 @@ def real_main():
         mset(key, an_info_hash, namespace='K')
 
     if STATS:
-        resps(bencode({'interval':INTERVAL, 'peers':rs,
-            'complete':(get(key_complete, namespace='S') or 0),
-            'incomplete':(get(key_incomplete, namespace='S') or 0)}))
+        resps(bencode({'interval': INTERVAL,
+                       'peers': rs,
+                       'complete': get(key_complete, namespace='S') or 0,
+                       'incomplete': get(key_incomplete, namespace='S') or 0}))
     else:
-        resps(bencode({'interval':INTERVAL, 'peers':rs}))
+        resps(bencode({'interval': INTERVAL,
+                       'peers': rs}))
 
 
 #MAIN = prof_main

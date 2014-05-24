@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>{{ title }}</title>
+        <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=Oxygen%2BMono%7CVollkorn%3A400italic%2C700italic%2C400%2C700" />
+        <link rel="stylesheet" type="text/css" href="//projectbeyond.org/css/main.css" />
+        <link rel="stylesheet" type="text/css" href="//projectbeyond.org/css/syntax.css" />
+    </head>
+    <body>
+        <header>
+            <h1>
+                <a href="/">{{ title }}</a>
+            </h1>
+            <ul class="contact">
+                <li class="icon icon_me">
+                    <a rel="me" href="//projectbeyond.org">Me</a>
+                </li>
+                <li class="icon icon_gh">
+                    <a href="https://github.com/xj9/greyskull">GH</a>
+                </li>
+            </ul>
+        </header>
+        <article>
+            <p>
+                A high-performance tracker based on <a href="http://repo.cat-v.org/atrack/">atrack</a> by
+                uriel. Greyskull is built on top of <a href="http://www.tornadoweb.org/">Tornado</a> and
+                can be deployed as a stand-alone Tornado HTTP Server or via <a href="http://gunicorn.org/">
+                Gunicorn</a>.
+            </p>
+            <p>
+                While Greyskull can serve as an excellent HTTP tracker for bittorrents, it is actually an
+                implementation of a leaner, more generalized protocol called
+                <a href="http://repo.cat-v.org/atrack/ntrack">NTrack</a>
+            </p>
+        </article>
+        <footer>
+
+        </footer>
+    </body>
+</html>
