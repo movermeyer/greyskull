@@ -1,17 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Memcached namespaces:
-    - 'K' -> key: [peer_hash0, peer_hash1, ...]
-    - 'P' -> peer_hash: ('ip', port)
-    - 'S' -> "%s!%s" % (key, param): int
-    - 'D' -> Debug data
-
-A peer_hash is: sha1("%s/%d" % (ip, port)).hexdigest()[:16]
-
-This allows peer info to be shared and decay by itself, we will delete
-references to peers from the key namespace lazily.
-
-MAKE SURE YOU REFER TO doc/ntrack.rst FOR CONSISTENCY!
+NTrack and a Bittorrent compatibility layer
 """
 
 from hashlib import sha1
@@ -41,26 +30,30 @@ class BTCompat(web.RequestHandler):
             self.redirect('/')
         else:
             args = dict(event=self.get_argument('event', default=None),
-                        left=self.get_argument('left', default=None))
+                        left=self.get_argument('left', default=None), )
             self.redirect('/ntrk/%s?%s' % (info_hash, urlencode(args)))
 
 
 class NTrack(web.RequestHandler):
-    STATS = True
-    ERRORS = True
-    INTERVAL = 18424  # ???
+    """
+    An implementation of the NTrack protocol based on the source of `ATrack`_ and the protocol
+    outlined in the `NTrack whitepaper`_. Though technically a fork, I've rewritten nearly
+    everything.
+
+    .. _ATrack: http://repo.cat-v.org/atrack/
+    .. _NTrack whitepaper: http://repo.cat-v.org/atrack/ntrack
+    """
     MEM_EXPIRE = 60 * 60 * 24 * 2  # ???
-    PEER_SIZE = 6
-    MAX_PEERS = 32
-    MAX_PEER_SIZE = PEER_SIZE * MAX_PEERS
 
-    def initialize(self, port):
-        self.port = port
+    # noinspection PyMethodOverriding
+    def initialize(self, port, stats, errors, interval):
+        self.port = int(port)
+        self.stats = bool(stats)
+        self.errors = bool(errors)
+        self.interval = int(interval)
 
-    def _update_stats(self, key,
-                      new_track=False, lost_peers=0,
-                      event=None, left=None):
-        if not self.STATS:
+    def _update_stats(self, key, new_track=False, lost_peers=0, event=None, left=None):
+        if not self.stats:
             return
         complete = '%s!complete' % key
         incomplete = '%s!incomplete' % key
@@ -78,36 +71,53 @@ class NTrack(web.RequestHandler):
             decr(incomplete, namespace='S')
             incr(complete, namespace='S')
 
-    def get(self, key):
+    def get(self, key: str):
+        """
+        Memcached namespaces:
+            - 'K' -> key: [peer_hash0, peer_hash1, ...]
+            - 'P' -> peer_hash: ('ip', port)
+            - 'S' -> "%s!%s" % (key, param): int
+            - 'D' -> Debug data
+
+        A peer_hash is: sha1("%s/%d" % (ip, port)).hexdigest()[:16]
+
+        This allows peer info to be shared and decay by itself, we will delete
+        references to peers from the key namespace lazily.
+
+        MAKE SURE YOU REFER TO doc/NTrack.rst FOR CONSISTENCY!
+
+        :param key:
+        :return:
+        """
         if len(key) > 128:
             pass  # TODO Insanely long key, let them know
-        phash = sha1("%s/%d" % (self.request.remote_ip, self.port)).hexdigest()[:16]
+        peer_hash = sha1("%s/%d" % (self.request.remote_ip, self.port)).hexdigest()[:16]
         event = self.get_argument('event', default=None)
         left = self.get_argument('left', default=None)
         if event == 'stopped':
-            mdel(phash, namespace='P')
+            mdel(peer_hash, namespace='P')
             self._update_stats(key, event=event, left=left)
-            self.write(bencode({'interval': self.INTERVAL,
+            self.write(bencode({'interval': self.interval,
                                 'peers': []}))
         elif event == 'completed':
             self._update_stats(key, event=event, left=left)
         elif event == 'started':
             self._update_stats(key, event=event, left=left)
-        peer_list = get(key, namespace='T')
+        peer_list = get(key, namespace='K')
         if peer_list:
-            res = ''
+            res = get_multi(peer_list, namespace='P')
         else:
-            peer_list = res = ''
+            peer_list = res = []
             self._update_stats(key, new_track=True)
-        if not phash in peer_list:
-            mset(phash, 1, namespace='P')
-            peer_list += phash
+        if not peer_hash in peer_list:
+            mset(peer_hash, self.request.remote_ip, namespace='P')
+            peer_list.append(peer_hash)
             mset(key, peer_list, namespace='K')
-        if self.STATS:
-            self.write(bencode({'interval': self.INTERVAL,
+        if self.stats:
+            self.write(bencode({'interval': self.interval,
                                 'peers': res,
                                 'complete': get('%s!complete' % key, namespace='S') or 0,
                                 'incomplete': get('%s!incomplete' % key, namespace='S') or 0}))
         else:
-            self.write(bencode({'interval': self.INTERVAL,
+            self.write(bencode({'interval': self.interval,
                                 'peers': res}))

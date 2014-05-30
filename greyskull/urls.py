@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from tornado.web import URLSpec as url
+import os
+
+from tornado.web import URLSpec
 
 from greyskull.handlers import (NTrack,
                                 BTCompat,
@@ -9,9 +11,12 @@ from greyskull.handlers import (NTrack,
                                 Redirect, )
 
 urlpatterns = [
-    url(r'/ntrk/(.*)', NTrack, kwargs=dict(port='80')),  # FIXME
-    url(r'/tracker', BTCompat),
-    url(r'', MemStat),
-    url(r'/', Index),
-    url(r'.*', Redirect),
+    URLSpec(r'/ntrk/(.*)', NTrack, kwargs=dict(port=os.getenv('GREYSKULL_EXTERNAL_PORT', 80),
+                                               stats=os.getenv('GREYSKULL_STATS', True),
+                                               errors=os.getenv('GREYSKULL_ERRORS', True),
+                                               interval=os.getenv('GREYSKULL_INTERVAL', 18424))),
+    URLSpec(r'/tracker', BTCompat),
+    URLSpec(r'', MemStat),
+    URLSpec(r'/', Index),
+    URLSpec(r'.*', Redirect),
 ]

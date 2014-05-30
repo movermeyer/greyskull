@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Greyskull: A better ntrack tracker
+Greyskull: A better NTrack tracker
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 

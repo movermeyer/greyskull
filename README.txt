@@ -1,25 +1,22 @@
-Atrack: An Ntrack Implementation
-===============================
+Greyskull: An NTrack Implementation
+===================================
 
-http://repo.cat-v.org/atrack/
-
-Atrack is a minimalist implementation of the Ntrack protocol (see ntrac.txt)
-designed for usage with Google's App Engine.
 
 
 Setup Instructions
 ------------------
 
-Create an App Engine application, change the 'application' name in app.yaml to
-match your app name, edit static/index.html to suit your taste and to mention
-the address of your tracker. Deploy with appcfg.py! You are done! 
+Greyskull is configured using the following environment variables:
 
+| Name                            | Description                                | Default
++
+| ``GREYSKULL_EXTERNAL_PORT``       || 80
++
+| ``GREYSKULL_MEMCACHED_ENDPOINTS`` || '127.0.0.1:11211'
 
 Contact
 -------
 
-http://uriel.cat-v.org/contact
-Irc: #bittorrent in irc.freenode.org
 
 
 License

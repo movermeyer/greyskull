@@ -1,5 +1,9 @@
-#!/bin/env python
+#!/bin/env python3
 # -*- coding: utf-8 -*-
+"""
+Greyskull in deployment is configured using environment variables, installing this package and
+configuring it via your preferred web server is recommended.
+"""
 
 from setuptools import setup
 
@@ -11,8 +15,8 @@ from greyskull import (__version__ as version,
 setup(
     name="Greyskull",
     version=version,
-    description="A lightweight bittorrent tracker",
-    long_description=open("README.txt", 'rb').read().decode('utf-8'),
+    description="A lightweight, bittorrent-compatible, NTrack tracker",
+    long_description=open("README.txt", 'rb').read().encode('utf-8'),
     license=license,
     author=author,
     author_email=author_email,
@@ -21,6 +25,18 @@ setup(
     ],
     install_requires=[
         'tornado',
+        'python3-memcached',
     ],
-    classifiers=[]
+    classifiers=[
+        'License :: Public Domain',
+        'License :: OSI Approved',
+        'License :: OSI Approved :: ISC License (ISCL)',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: POSIX',
+        'Programming Language :: Python :: 2',
+        'Programming Language :: Python :: 3',
+        'Topic :: Internet',
+        'Topic :: Internet :: WWW/HTTP',
+        'Topic :: System :: Networking',
+    ]
 )
