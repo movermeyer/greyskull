@@ -5,12 +5,12 @@ NTrack and a Bittorrent compatibility layer
 
 from hashlib import sha1
 
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urlparse
 
 from tornado import web
 
 from greyskull.bencode import bencode
-
+from greyskull.ip_utils import encode_host_and_port
 from greyskull.storage import (get,
                                set as mset,
                                get_multi,
@@ -105,14 +105,21 @@ class NTrack(web.RequestHandler):
             self._update_stats(key, event=event, left=left)
         peer_list = get(key, namespace='K')
         if peer_list:
-            res = get_multi(peer_list, namespace='P')
+            if peer_hash in peer_list:
+                peer_list.remove(peer_hash)
+            peers = get_multi(peer_list, namespace='P')
+            for p_hash, peer in zip(peer_list, peers):
+                if peer is None:
+                    peer_list.remove(p_hash)
+                    peers.remove(peer)
+            res = [encode_host_and_port(peer.ip, peer.port) for peer in peers]
         else:
             peer_list = res = []
             self._update_stats(key, new_track=True)
         if not peer_hash in peer_list:
-            mset(peer_hash, self.request.remote_ip, namespace='P')
+            mset(peer_hash, (self.request.remote_ip, self.port), namespace='P')
             peer_list.append(peer_hash)
-            mset(key, peer_list, namespace='K')
+        mset(key, peer_list, namespace='K')
         if self.stats:
             self.write(bencode({'interval': self.interval,
                                 'peers': res,

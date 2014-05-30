@@ -33,7 +33,6 @@ setup(
         'License :: OSI Approved :: ISC License (ISCL)',
         'License :: OSI Approved :: MIT License',
         'Operating System :: POSIX',
-        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Topic :: Internet',
         'Topic :: Internet :: WWW/HTTP',
