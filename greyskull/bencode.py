@@ -22,7 +22,7 @@ def bencode(x):
             if isinstance(key, int):
                 raise TypeError
         r.append('d')
-        encoded_list = ((bencode(k), bencode(v)) for k, v in sorted(x.items()))
-        r.extend([chain(*encoded_list)])
+        encoded_list = [(bencode(k), bencode(v)) for k, v in sorted(x.items())]
+        r.extend(tuple(chain(*encoded_list)))
         r.append('e')
     return ''.join(r)

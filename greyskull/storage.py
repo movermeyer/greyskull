@@ -17,7 +17,7 @@ if isinstance(SERVERS, str):
     if SERVERS[-1] == '':
         SERVERS = SERVERS[:-1]
 
-mc = Client(SERVERS, debug=0)
+mc = Client(['127.0.0.1:11211'], debug=0)
 
 
 def _namespace_key(key: str, namespace: str or None) -> str:
