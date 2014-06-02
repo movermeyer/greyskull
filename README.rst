@@ -1,4 +1,4 @@
-|travis-ci|
+|travis_ci| |coveralls| |version|
 
 Greyskull
 =========
@@ -46,5 +46,13 @@ All original code is in the public domain, MIT, or ISC at your choice.
 The Bencode generation code originally from the standard python bittorrent
 implementation is by Petru Paler and under a MIT licenses (AFAIK).
 
-.. |travis-ci| image:: https://travis-ci.org/xj9/greyskull.svg?branch=master
+
+.. |travis_ci| image:: https://travis-ci.org/xj9/greyskull.svg?branch=master
    :target: https://travis-ci.org/xj9/greyskull
+
+.. |coveralls| image:: https://coveralls.io/repos/xj9/greyskull/badge.png
+   :target: https://coveralls.io/r/xj9/greyskull
+
+.. |version| image:: https://pypip.in/version/Greyskull/badge.png
+   :target: https://pypi.python.org/pypi/Greyskull/
+   :alt: Latest Version
