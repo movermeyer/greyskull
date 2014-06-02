@@ -1,7 +1,9 @@
-Greyskull: An NTrack Implementation
-===================================
+|travis-ci|
 
+Greyskull
+=========
 
+An NTrack Implementation
 
 Setup Instructions
 ------------------
@@ -43,3 +45,6 @@ All original code is in the public domain, MIT, or ISC at your choice.
 
 The Bencode generation code originally from the standard python bittorrent
 implementation is by Petru Paler and under a MIT licenses (AFAIK).
+
+.. |travis-ci| image:: https://travis-ci.org/xj9/greyskull.svg?branch=master
+   :target: https://travis-ci.org/xj9/greyskull
