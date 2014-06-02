@@ -16,7 +16,7 @@ setup(
     name="Greyskull",
     version=version,
     description="A lightweight, bittorrent-compatible, NTrack tracker",
-    long_description=open("README.txt", 'rb').read().encode('utf-8'),
+    long_description=open("README.txt", 'rb').read().decode('utf-8'),
     license=license,
     author=author,
     author_email=author_email,

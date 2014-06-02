@@ -9,22 +9,20 @@ from itertools import chain
 
 def bencode(x):
     r = []
-    if isinstance(x, (int, long, bool)):
+    if isinstance(x, (int, bool)):
         r.extend(('i', str(x), 'e'))
     elif isinstance(x, str):
         r.extend((str(len(x)), ':', x))
-    elif isinstance(x, (list, tuple)):
+    elif isinstance(x, (list, tuple)):  # FIXME do interface checking rather than type checking
         r.append('l')
         r.extend(bencode(i) for i in x)
         r.append('e')
     elif isinstance(x, dict):
-        for key in x.iterkeys():
+        for key in x.keys():
             if isinstance(key, int):
                 raise TypeError
         r.append('d')
-        ilist = x.items()
-        ilist.sort()
-        flist = tuple((bencode(k), bencode(v)) for k, v in ilist)
-        r.extend(tuple(chain(*flist)))
+        encoded_list = ((bencode(k), bencode(v)) for k, v in sorted(x.items()))
+        r.extend([chain(*encoded_list)])
         r.append('e')
     return ''.join(r)

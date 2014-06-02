@@ -5,7 +5,7 @@ NTrack and a Bittorrent compatibility layer
 
 from hashlib import sha1
 
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode
 
 from tornado import web
 
@@ -52,7 +52,7 @@ class NTrack(web.RequestHandler):
         self.errors = bool(errors)
         self.interval = int(interval)
 
-    def _update_stats(self, key, new_track=False, lost_peers=0, event=None, left=None):
+    def _update_stats(self, key, new_track=False, lost_peers=0, event=None, left=None) -> None:
         if not self.stats:
             return
         complete = '%s!complete' % key
@@ -71,15 +71,18 @@ class NTrack(web.RequestHandler):
             decr(incomplete, namespace='S')
             incr(complete, namespace='S')
 
+    def _peer_hash(self, ip: str, port: int or None=None) -> str:
+        if port is None:
+            port = self.port
+        return sha1("%s/%d" % (ip, port)).hexdigest()[:16]
+
     def get(self, key: str):
         """
         Memcached namespaces:
-            - 'K' -> key: [peer_hash0, peer_hash1, ...]
-            - 'P' -> peer_hash: ('ip', port)
-            - 'S' -> "%s!%s" % (key, param): int
+            - 'K' -> key: [peer_hash: str, ...]
+            - 'P' -> peer_hash: (ip: str, port: int)
+            - 'S' -> "%s!%s" % (key: str, param: str): int
             - 'D' -> Debug data
-
-        A peer_hash is: sha1("%s/%d" % (ip, port)).hexdigest()[:16]
 
         This allows peer info to be shared and decay by itself, we will delete
         references to peers from the key namespace lazily.
@@ -91,7 +94,7 @@ class NTrack(web.RequestHandler):
         """
         if len(key) > 128:
             pass  # TODO Insanely long key, let them know
-        peer_hash = sha1("%s/%d" % (self.request.remote_ip, self.port)).hexdigest()[:16]
+        peer_hash = self._peer_hash(self.request.remote_ip)
         event = self.get_argument('event', default=None)
         left = self.get_argument('left', default=None)
         if event == 'stopped':
@@ -108,11 +111,11 @@ class NTrack(web.RequestHandler):
             if peer_hash in peer_list:
                 peer_list.remove(peer_hash)
             peers = get_multi(peer_list, namespace='P')
-            for p_hash, peer in zip(peer_list, peers):
-                if peer is None:
-                    peer_list.remove(p_hash)
-                    peers.remove(peer)
-            res = [encode_host_and_port(peer.ip, peer.port) for peer in peers]
+            lost_peers = [p_hash for p_hash, peer in zip(peer_list, peers) if peer is None]
+            if lost_peers:
+                for lost_peer in lost_peers:
+                    pass
+            res = [encode_host_and_port(peer[0], peer[1]) for peer in peers]
         else:
             peer_list = res = []
             self._update_stats(key, new_track=True)

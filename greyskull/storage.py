@@ -25,7 +25,7 @@ def _namespace_key(key: str, namespace: str or None) -> str:
 
     """
     if namespace is not None:
-        return '###'.join([namespace, key])
+        return '/'.join([namespace, key])
     else:
         return key
 
