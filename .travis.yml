@@ -5,6 +5,9 @@ python:
     - "3.4"
 install:
     - pip install .
-    - pip install coveralls
-script: nosetests --with-coverage --cover-package=greyskull
-after_success: coveralls
+    - pip install nose coverage
+before_script:
+    - mkdir -p shippable/testresults
+script:
+    - nosetests --with-coverage --cover-package=greyskull --with-xunit --xunit-file=shippable/testresults/nosetests.xml
+    - coverage xml -o shippable/codecoverage/coverage.xml
