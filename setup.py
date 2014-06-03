@@ -7,20 +7,15 @@ configuring it via your preferred web server is recommended.
 
 from setuptools import setup
 
-from greyskull import (__version__ as version,
-                       __license__ as license,
-                       __author__ as author,
-                       __email__ as author_email)
-
 setup(
     name="Greyskull",
-    version=version,
+    version="0.0.1.dev1",
     description="A lightweight, bittorrent-compatible, NTrack tracker",
     long_description=open("README.rst", 'rb').read().decode('utf-8'),
     url='http://github.com/xj9/greyskull',
-    license=license,
-    author=author,
-    author_email=author_email,
+    license="MIT/ISC",
+    author="Carlos Killpack",
+    author_email="carlos.killpack@rocketmail.com",
     packages=[
         'greyskull',
     ],
