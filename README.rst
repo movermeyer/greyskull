@@ -50,9 +50,9 @@ implementation is by Petru Paler and under a MIT licenses (AFAIK).
 .. |travis_ci| image:: https://travis-ci.org/xj9/greyskull.svg?branch=master
    :target: https://travis-ci.org/xj9/greyskull
 
-.. |coveralls| image:: https://coveralls.io/repos/xj9/greyskull/badge.png
+.. |coveralls| image:: https://img.shields.io/coveralls/xj9/greyskull.svg
    :target: https://coveralls.io/r/xj9/greyskull
 
-.. |version| image:: https://pypip.in/version/Greyskull/badge.png
+.. |version| image:: https://pypip.in/version/Greyskull/badge.svg
    :target: https://pypi.python.org/pypi/Greyskull/
    :alt: Latest Version
