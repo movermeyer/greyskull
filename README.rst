@@ -53,6 +53,6 @@ implementation is by Petru Paler and under a MIT licenses (AFAIK).
 .. |coveralls| image:: https://img.shields.io/coveralls/xj9/greyskull.svg
    :target: https://coveralls.io/r/xj9/greyskull
 
-.. |version| image:: https://pypip.in/version/Greyskull/badge.svg
+.. |version| image:: https://img.shields.io/pypi/v/Greyskull.svg
    :target: https://pypi.python.org/pypi/Greyskull/
    :alt: Latest Version
